@@ -1,4 +1,5 @@
 A group project cloning NCBI's blast functionality.
+Copied from GitLab
 
 
 # MasterBlast developer's guide

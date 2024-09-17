@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+{% load static %}
+
+<html class="" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}base page{% endblock %}</title>
+
+    <link href="{% static 'css/base.css' %}" rel="stylesheet">
+    <link rel="icon" href="{% static 'img/MB_logo.jpg' %}" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Afacad" rel="stylesheet">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tablesaw/3.1.2/tablesaw.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tablesaw/3.1.2/tablesaw.jquery.js"></script>
+
+
+    {% block headerJS %}{% endblock %}
+    {% block headerCSS %}{% endblock %}
+</head>
+<body class="">
+
+    <header>
+        <a href="/" class="logo-div">
+            <img src="{% static 'img/MB_logo.jpg' %}" class="mb-logo">
+        </a>
+
+
+        <nav class="navbar">
+            <ul style="display: flex; list-style-type: none; gap: 20px;">
+                {% if user.is_authenticated %}
+                    <li><a class="submit-button" href="/recent">Recent</a></li>
+                    <li><a class="submit-button" href="/personalia">Personalia</a></li>
+                    <li><a class="submit-button" href="/logout">Log out</a></li>
+                {% else %}
+                    <li><a class="submit-button" href="/login">Log in</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        {% block content %}
+        <!-- Normal content goes here -->
+        {% endblock %}
+    </main>
+
+    {% block extrascripts %}
+    <!-- Extra scripts to be added -->
+    {% endblock %}
+
+</body>
+</html>

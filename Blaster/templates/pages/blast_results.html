@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Blast Results{% endblock %}
+
+{% block headerJS %}
+<script src="{% static '/js/enhance-tablesaw.js' %}"></script>
+<script src="{% static '/js/format-e-value.js' %}"></script>
+<script src="{% static '/js/select-all.js' %}"></script>
+<script src="{% static '/js/blast_result_error.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+
+{% if messages %}
+{% for message in messages %}         
+<p class="error-message">{{ message }}</p>
+{% endfor %}
+{% endif %}
+
+{% if job.error_msg %}
+<p class="error-message">This BLAST job failed with error message:<br>{{ job.error_msg }}</p>
+{% endif %}
+
+<section class="blast-results-header">
+    <div id="blast-results-header-color-strip"></div>
+    <article class="blast-result-job-info">
+        <h3>{{ job.title }}</h3>
+        <p>Query length: {{ job.sequence|length }}</p>
+        <p>Hit count: {{ hits|length }}</p>
+        <p>Date: {{ job.date }}</p>
+        <p>Time: {{ job.time|date:"H:i" }}</p>
+        {% if job.user %}
+        <p>User: {{ job.user.username }}</p>
+        {% else %}
+        <p>User: unknown</p>
+        {% endif %}
+    </article>
+</section>
+
+
+
+    <button type="submit" class="submit-button" id="share-btn" onclick="share_job_show()" {% if not user.is_authenticated or job.user.username != user.username %}style="display: none;"{% endif %}>
+        Share job
+    </button>
+
+{% if not job.error_msg and hits %}
+
+    <form id="comparison-form" method="post">
+    {% csrf_token %}
+    <button type="submit" class="submit-button" id="comparison-button">Comparison</button>
+
+    <section class="blast-results-table">
+        <table data-tablesaw-sortable>
+            <thead>
+                <tr>
+                    <th style="position: sticky; top: 0; z-index: 100;" data-tablesaw-sortable-col>Description</th>
+                    <th style="position: sticky; top: 0; z-index: 100;" data-tablesaw-sortable-col>Organism</th>
+                    <th style="position: sticky; top: 0; z-index: 100;" data-tablesaw-sortable-col data-tablesaw-sortable-numeric>BLAST score</th>
+                    <th style="position: sticky; top: 0; z-index: 100;" data-tablesaw-sortable-col data-tablesaw-sortable-numeric>Query coverage</th>
+                    <th style="position: sticky; top: 0; z-index: 100;" data-tablesaw-sortable-col data-tablesaw-sortable-numeric>Bit score</th>
+                    <th style="position: sticky; top: 0; z-index: 100;" data-tablesaw-sortable-col data-tablesaw-sortable-numeric id="custom-sort">E-value</th>
+                    <th style="position: sticky; top: 0; z-index: 100;" data-tablesaw-sortable-col data-tablesaw-sortable-numeric>Percentage Identity</th>
+                    <th style="position: sticky; top: 0; z-index: 100;">Alignment</th>
+                    <th style="position: sticky; top: 0; z-index: 100;" id="select-header" onclick="selectAll()">Select</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for hit in hits %}
+                <tr>
+                    <td><a href="/blast_hit/{{ hit.id }}">{{ hit.description }}</a></td>
+                    <td>{{ hit.accession.organism }}</td>
+                    <td>{{ hit.blast_score }}</td>
+                    <td>{{ hit.query_coverage }}</td>
+                    <td>{{ hit.bit_score }}</td>
+                    <td>
+                        <!-- In order to allow tablesaw to sort this column,
+                        the E-value data is loaded but hidden in decimal notation
+                        and it's displayed in E-notation -->
+                        <span id="decimal-e-value-{{ hit.accession.code }}" style="display: none">{{ hit.e_value }}</span>
+                        <span id="display-e-value-{{ hit.accession.code }}">{{ hit.e_value }}</span>
+                    </td>
+                    <td>{{ hit.percentage_identity }}</td>
+                    <td>
+                        Query<br>
+                        {{ hit.query_start }} ... {{ hit.query_end }}<br>
+                        {{ hit.subject_start }} ... {{ hit.subject_end }}<br>
+                        Subject
+                    </td>
+                    <td><input type="checkbox" name="selected_hits" class="select-all" value="{{ hit.id }}"></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+</form>
+{% endif %}
+
+<section id="share_kader" style="z-index: 1000;">
+    <button id="share-close" onclick="share_job_close()">&#9932</button>
+    <h4>Share job {{ job.title }} </h4>
+    {% if user.blastbuddies_as_user and user.blastbuddies_as_user.buddie.exists %}
+    <table id="buddie_list">
+            {% for buddie in user.blastbuddies_as_user.buddie.all %}
+            <tr>
+                <td>{{ buddie.username }}</td>
+                <td class="shared">
+                    {% if shared_already|get_item_from_dic:buddie.id %}
+                        <span>Shared already</span>
+                    {% else %}
+                        <form method="post" action="{% url 'share_to_buddie' job.id buddie.username %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="buddy_id" value="{{ buddie.id }}">
+                            <button type="submit" id="share_buddie_{{ buddie.id }}" class="shared_btn">Share</button>
+                        </form>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+    </table>    
+    {% else %}
+        <p>No Blast Buddies yet! Add new Blast Buddies.</p><br>
+    {% endif %}
+</section>
+
+{% load static %}
+    <script>
+        $(document).ready(function(){
+            $(document).trigger("enhance.tablesaw");
+        });
+    </script>
+    <script src="{% static '/js/share_job.js' %}" type="text/javascript"></script
+
+{% endblock %}

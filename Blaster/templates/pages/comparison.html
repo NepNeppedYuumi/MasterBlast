@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Comparison{% endblock %}
+
+{% block headerJS %}
+<script src="{% static '/js/enhance-tablesaw.js' %}"></script>
+<script src="{% static '/js/format-e-value.js' %}"></script>
+<script src="{% static '/js/comparison-graphs.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+
+    <section id="comparison-graph-section">
+
+        <div id="comparison-graph-div">
+            <h2>Comparison graph</h2><br>
+            <select name="comparison-graph-display" id="switch-graphs">
+                <option value="seqlen">Sequence length</option>
+                <option value="perc_ident">Percentage identity</option>
+                <option value="query_cov">Query coverage</option>
+                <option value="evalue">E-value</option>
+            </select>
+        </div>
+
+        <section id="comparison-graph">
+            <div id="seqlen" style="display: block;">{{ graphs.seqlen.div | safe }}</div>
+            <div id="perc_ident" style="display: none;">{{ graphs.perc_identity.div | safe }}</div>
+            <div id="query_cov" style="display: none;">{{ graphs.query_coverage.div | safe }}</div>
+            <div id="evalue" style="display: none;">{{ graphs.e_value.div | safe }}</div>
+        </section>
+
+    </section>
+
+    <section class="comparison-table">
+
+        <h2>Selected results</h2>
+        <table class="tablesaw" data-tablesaw-sortable>
+            <thead>
+                <tr>
+                    <th style="position: sticky; top: 0;" data-tablesaw-sortable-col> Description </th>
+                    <th style="position: sticky; top: 0;" data-tablesaw-sortable-col> Accession </th>
+                    <th style="position: sticky; top: 0;" data-tablesaw-sortable-col data-tablesaw-sortable-numeric> Length </th>
+                    <th style="position: sticky; top: 0;" data-tablesaw-sortable-col> Organism </th>
+                    <th style="position: sticky; top: 0;" data-tablesaw-sortable-col data-tablesaw-sortable-numeric> Query Coverage </th>
+                    <th style="position: sticky; top: 0;" data-tablesaw-sortable-col data-tablesaw-sortable-numeric> Perc. Identity </th>
+                    <th style="position: sticky; top: 0;" data-tablesaw-sortable-col> E-value </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for hit in selected_hits %}
+                    <tr>
+                        <td><a href="/blast_hit/{{ hit.id }}">{{ hit.description }}</a></td>
+                        <td>{{ hit.unique_accession }}</td>
+                        <td>{{ hit.subject_seq|length }}</td>
+                        <td>{{ hit.accession.organism }}</td>
+                        <td>{{ hit.query_coverage }}</td>
+                        <td>{{ hit.percentage_identity }}</td>
+                        <td>
+                            <!-- In order to allow tablesaw to sort this column,
+                            the E-value data is loaded but hidden in decimal notation
+                            and it's displayed in E-notation -->
+                            <span id="decimal-e-value-{{ hit.accession.code }}" style="display: none">{{ hit.e_value }}</span>
+                            <span id="display-e-value-{{ hit.accession.code }}">{{ hit.e_value }}</span>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </section>
+
+{% endblock %}
+
+
+{% block extrascripts %}
+    <script src="https://cdn.bokeh.org/bokeh/release/bokeh-3.3.4.min.js" crossorigin="anonymous"></script>
+    {% for key, value in graphs.items %}
+        {{ value.script | safe }}
+    {% endfor %}
+{% endblock %}
+

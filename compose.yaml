@@ -1,0 +1,38 @@
+version: 4.28.0
+
+services:
+  django:
+    container_name: django
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=1
+      - ALLOWED_HOSTS=localhost,127.0.0.1
+      - APP_BROKER_URI=amqp://rabbitmq
+    depends_on:
+      - rabbitmq
+
+  celery:
+    build: .
+    command: celery -A BlastBuddyClub worker -l INFO -P gevent
+    volumes:
+      - .:/app
+    environment:
+      - DEBUG=1
+      - ALLOWED_HOSTS=localhost,127.0.0.1
+      - APP_BROKER_URI=amqp://rabbitmq
+    depends_on:
+      - rabbitmq
+
+  rabbitmq:
+    hostname: rabbitmq
+    image: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"

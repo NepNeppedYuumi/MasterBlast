@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Blast Hit{% endblock %}
+
+{% block headerJS %}
+<script src="{% static '/js/export-hit.js' %}"></script>
+<script src="{% static '/js/format-e-value.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+<section>
+    <head>
+        <meta id="genbank" data-name="{{ genbank }}" data-other="{{ hit.accession.code }}.gb">
+        <meta id="fasta" data-name="{{ fasta }}" data-other="{{ hit.accession.code }}.fasta">
+    </head>
+</section>
+
+<section>
+    <h2 id="blast-hit-title">{{ hit.description }}</h2>
+
+    <table id="blast-hit-table">
+        <thead>
+            <tr>
+                <th>Accession</th>
+                <th>Query length</th>
+                <th>Organism</th>
+                <th>Percentage identity</th>
+                <th>Query coverage</th>
+                <th>E-value</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{ hit.accession.code }}</td>
+                <td>{{ hit.job.sequence|length }}</td>
+                <td>{{ hit.accession.organism }}</td>
+                <td>{{ hit.percentage_identity }}</td>
+                <td>{{ hit.query_coverage }}</td>
+                <td>
+                    <!-- In order to allow tablesaw to sort this column,
+                    the E-value data is loaded but hidden in decimal notation
+                    and it's displayed in E-notation -->
+                    <span id="decimal-e-value-{{ hit.accession.code }}" style="display: none">{{ hit.e_value }}</span>
+                    <span id="display-e-value-{{ hit.accession.code }}">{{ hit.e_value }}</span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+
+{% if genbank or fasta %}
+<section id="blast-hit-gb-and-export">
+    <div>
+        {% if hit.accession.cache.genbank %}
+        <h2>Genbank</h2>
+        
+        <pre>
+            {{ genbank }}
+        </pre>
+        {% endif %}
+    </div>
+
+    <form id="blast-hit-export-form">
+        <h2>Export to file</h2>
+
+        <select id="export-format" name="export-format">
+            {% if hit.accession.cache.genbank %}
+            <option value="genbank" selected>Genbank</option>
+            {% endif %}
+            {% if hit.accession.cache.fasta %}
+            <option value="fasta">FASTA</option>
+            {% endif %}
+        </select>
+
+        <input type="submit" class="submit-button blast-hit-export-button" value="Export" onclick="exportFile()"> 
+    </form>
+
+</section>
+{% endif %}
+
+{% if messages %}
+{% for message in messages %}         
+<p class="error-message">{{ message }}</p>
+{% endfor %}
+{% endif %}
+
+{% endblock %}

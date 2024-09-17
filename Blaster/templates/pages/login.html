@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}Login{% endblock %}
+
+{% block content %}
+    <form method="post" action="" id="login-form" class="generic-form">
+        {% csrf_token %}
+        <h2 id="login-header" class="generic-form-header">Log in</h2>
+        <div class="generic-form-input-wrapper">
+            <label for="Username">Username</label><br>
+            <input type="text" placeholder="Username" name="Username" id="Username" class="generic-form-text-input" required><br>
+            <label for="Password">Password</label><br>
+            <input type="password" placeholder="Password" name="Password" id="Password" class="generic-form-text-input" required><br>
+        </div>
+
+        <label for="signup" id="login-page-signup-button-header">No account yet?</label>
+        <div class="generic-form-button-wrapper">
+            <input type="submit" value="Log in" name="Log_in" class="submit-button" id="Log_in">
+            <button onclick="location.href='/signup'" type="button" class="submit-button" id="to-sign-up-button">To sign up</button>
+        </div>
+        <input type="text" id="next-page-field" name="next" value="{{ request.GET.next }}" style="display: none;">
+    </form>
+
+    {% if messages %}
+    {% for message in messages %}
+    <p class="error-message">{{ message }}</p>
+    {% endfor %}
+    {% endif %}
+
+{% endblock %}

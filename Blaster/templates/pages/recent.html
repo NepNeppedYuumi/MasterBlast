@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Recent{% endblock %}
+
+{% block headerJS %}
+<script src="{% static '/js/enhance-tablesaw.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+
+    <section>
+        <form method="post" id="recent-page-filter-form">
+            {% csrf_token %}
+            <label for="filter-title">Name contains:</label>
+            <input class="recent-page-filter-form-input" type="text" name="filter-title" id="filter-title" placeholder="Name contains...">
+
+            <label for="length">Length range:</label>
+            <input class="recent-page-filter-form-input" type="number" name="filter-min-length" placeholder="Min length...">
+            <input class="recent-page-filter-form-input" type="number" name="filter-max-length" placeholder="Max length...">
+
+            <label for="filter-date">Date:</label>
+            <input class="recent-page-filter-form-input" type="date" name="filter-date" id="filter-date">
+
+            <button type="submit" class="submit-button" id="recent-page-filter-submit">Filter</button>
+        </form>
+    </section>
+
+    <section>
+        <table class="blast-results-table" data-tablesaw-sortable>
+            <thead>
+                <tr>
+                    <th data-tablesaw-sortable-col>Job title</th>
+                    <th data-tablesaw-sortable-col data-tablesaw-sortable-numeric>Hit count</th>
+                    <th data-tablesaw-sortable-col data-tablesaw-sortable-numeric>Query length</th>
+                    <th data-tablesaw-sortable-col>Date - time</th>
+                </tr>
+            </thead>
+            <tbody>
+            <tbody>
+                {% for job in recent_jobs %}
+                <tr>
+                    <td><a href="blast_result/{{ job.id }}">{{ job.title }}</a></td>
+                    <td>{{ job.hits }}</td>
+                    <td>{{ job.query_length }}</td>
+                    <td>{{ job.date|date:"Y-m-d" }} - {{ job.time|date:"H:i" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+
+{% endblock %}

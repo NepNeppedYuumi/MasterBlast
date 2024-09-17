@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Does not exist{% endblock %}
+
+{% block content %}
+<section class="error-page-message">
+    <h1 class="error-page-header">Error 404: page not found</h1>
+    <p>The page you tried to visit does not exist.</p>
+    <button class="submit-button" id="error-page-go-back" onclick="history.back()">Go back</button>
+</section>
+{% endblock %}

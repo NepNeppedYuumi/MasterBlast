@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+{% block title %}Personalia{% endblock %}
+
+{% block content %}
+    <div class="personalia_wrapper">
+        <section class="personalia_ac_inf">
+            <!-- frame for the Account information -->
+
+            <h2 id="Account_information">Account information?</h2><br>
+            <p id="username">{{ user.username }}</p><br>
+            <p id="email">{{ user.email }}</p><br>
+            <h4 id="change_password">Change password</h4><br>
+
+            <form method="post" action="">
+                {% csrf_token %}
+                <input type="password" class="generic-form-text-input" placeholder="Old password..." name="Old_Password" id="Old_Password" required><br>
+                <input type="password" class="generic-form-text-input" placeholder="New password..." name="New_Password" id="New_Password" required><br>
+                <input type="password" class="generic-form-text-input" placeholder="Confirm new password..." name="New_Password2" id="New_Password2" required><br>
+
+                <input type="submit" value="Change password" name="Change_password" class="submit-button" id="Change_password">
+            </form><br>
+
+            {% if messages %}
+            {% for message in messages %}         
+            <p class="">{{ message }}</p>
+            {% endfor %}
+            {% endif %}
+        
+        </section>
+        <section class="personalia_left_side_scroll">
+            <section class="personalia_ac_stats">
+                <!-- frame for the user stats -->
+                <h2 id="blast-hit-title">User stats</h2><br>
+                
+                <div class="user_stats_list">
+                <dl>
+                    <dd id="jobs_done">
+                        <b>{{ jobs_done }}</b>
+                    </dd>
+                    <dt id="jobs_done">Jobs done</dt><br>
+                </dl>
+                <dl>
+                    <dd id="Days_on_MasterBlast">
+                        <b>{{ days_on_master_blast }}</b>
+                    </dd>
+                    <dt id="Days_on_MasterBlast">Days on MasterBlast</dt><br>
+                </dl>
+                <dl>
+                    <dd id="Total_query_sequence_length">
+                        <b>{{ tot_query_len }}</b>
+                    </dd>
+                    <dt id="Total_query_sequence_length">Total query sequence length</dt><br>
+                </dl>
+                <dl>
+                    <dd id="Average_hits_per_job">
+                        <b>{{ avg_hits_job }}</b>
+                    </dd>
+                    <dt id="Average_hits_per_job">Average hits per job</dt><br>
+                </dl>
+                <dl>
+                    <dd id="Longest_query_submitted">
+                        <b>{{ Longes_query }}</b>
+                    </dd>
+                    <dt id="Longest_query_submitted">Longest query submitted</dt><br>
+                </dl>
+            </div>
+
+            </section>
+            <section class="personalia_ac_stats">
+                <!--- frame for the blast buddie club friends list--->
+                <h2 id="blast-hit-title">My Blast Buddy Club</h2>
+
+                {% if user.blastbuddies_as_user and user.blastbuddies_as_user.buddie.exists %}
+                <table id="buddie_list">
+                        {% for buddie in user.blastbuddies_as_user.buddie.all %}
+                        <tr>
+                            <td name="buddie_username">{{ buddie.username }}</td>
+                            <td>
+                                <form method="post" action="{% url 'remove_buddie' user.username buddie.username %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="buddy_id" value="{{ buddie.id }}">
+                                    <button type="submit" id="verwijder_buddie_{{ buddie.id }}" class="rem_buddie">&#128100;
+                                        <span style="font-size: 30px;">-</span>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                </table>    
+                {% else %}
+                    <p id="buddie_list">No Blast Buddies yet! Add new Blast Buddies below.</p><br>
+                {% endif %}
+
+                <span class="search_flex">
+                    <input type="text" class="generic-form-text-input" id="search_name" placeholder="Enter username..." required>
+                    <button onclick="search_user('{{ user.username }}')" id="search_button">&#x1F50D;&#xFE0E;</button>
+                </span>
+
+                <table id="user_list">
+                </table>
+
+            </section>
+            <section class="personalia_ac_stats">
+                <!--- frame for the shared jobs --->
+                <h2 id="blast-hit-title">Shared MasterBlast jobs</h2>
+
+                {% if user.shared_jobs_user.shared_job.exists %}
+                <table id="shared_jobs">
+                        <tr>
+                            <th>Job title</th>
+                            <th>Hit count</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Shared by</th>
+                        </tr>
+                        {% for shared_job in shared_jobs %}
+                            <tr>
+                                <td><a href="blast_result/{{ shared_job.id }}">{{ shared_job.title }}</a></td>
+                                <td>{{ shared_job.hit_count }}</td>
+                                <td>{{ shared_job.date }}</td>
+                                <td>{{ shared_job.time|date:"H:i" }}</td>
+                                <td>{{ shared_job.user.username }}</td>
+                            </tr>
+                        {% endfor %}
+                </table>    
+                {% else %}
+                    <p>No shared jobs yet.</p><br>
+                {% endif %}
+            </section>
+        </section>
+    </div>
+        
+    {% load static %}
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+     integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="{% static 'js/blastbuddie.js' %}" type="text/javascript"></script>
+
+{% endblock %}

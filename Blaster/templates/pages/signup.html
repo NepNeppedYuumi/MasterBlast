@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}Signup{% endblock %}
+
+{% block content %}
+
+    <form method="post" action="" id="signup-form" class="generic-form">
+        {% csrf_token %}
+        <h2 id="signup-header" class="generic-form-header">Sign up</h2>
+        <div class="generic-form-input-wrapper">
+            <label for="Username">Username</label><br>
+            <input type="text" class="generic-form-text-input" id="Username" placeholder="Username..." name="Username" required><br>
+            <label for="Email">Email adress</label><br>
+            <input type="email" class="generic-form-text-input" id="Email" placeholder="Email adress..." name="Email" required><br>
+            <label for="Password">Password</label><br>
+            <input type="password" class="generic-form-text-input" id="Password" placeholder="Password..." name="Password" required>
+        </div>
+
+        <div class="generic-form-button-wrapper">
+            <button onclick="location.href='/login'" type="button" class="submit-button">To log in </button>
+            <input type="submit" value="Sign up" class="submit-button" id="Signup" name="Signup">
+        </div>
+    </form>
+        
+    {% if messages %}
+    {% for message in messages %}         
+    <p class="error-message">{{ message }}</p>
+    {% endfor %}
+    {% endif %}
+
+{% endblock %}

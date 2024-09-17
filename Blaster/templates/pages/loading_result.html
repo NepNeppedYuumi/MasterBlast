@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Blast{% endblock %}
+
+{% load static %}
+
+{% block content %}
+    <section>
+        <h2>{{ title }}</h2>
+        <p>Time elapsed <span id="total-time"></span></p>
+        <p>Retrying in <span id="time-left"></span></p>
+
+        <img src="{% static 'img/loading-circle.svg' %}">
+    </section>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"
+    integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script src="{% static 'js/loading_result.js' %}"></script>
+{% endblock %}

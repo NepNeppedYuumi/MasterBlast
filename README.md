@@ -1,3 +1,6 @@
+A group project cloning NCBI's blast functionality.
+
+
 # MasterBlast developer's guide
 
 ## Introduction
